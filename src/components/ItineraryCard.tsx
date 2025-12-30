@@ -8,8 +8,9 @@ import { AIRLINE_CODES } from '@/config/airline-codes';
 interface ItineraryCardProps {
   item: Activity;
   index: number;
-  onQrClick: (slots: TicketSlot[], index: number) => void;
- }
+  onQrClick?: (slots: TicketSlot[], index: number) => void;
+}
+
 
 // Shared button style for Map Targets and App Jump buttons to ensure visual consistency
 const ACTION_BUTTON_CLASS = "flex items-center gap-2 px-4 py-3 border border-gray-200 hover:border-[#FF0000] hover:text-[#FF0000] transition-colors bg-white text-black min-h-[48px]";
@@ -300,7 +301,7 @@ const TicketGroupRenderer: React.FC<{
   type: TicketSlot['type'];
   slots: TicketSlot[];
   activity: Activity;
-  onQrClick: (slots: TicketSlot[]) => void;
+  onQrClick?: (slots: TicketSlot[], index: number) => void;
 }> = ({ type, slots, activity, onQrClick }) => {
   
   const stopProp = (e: React.MouseEvent) => e.stopPropagation();
@@ -349,7 +350,7 @@ const TicketGroupRenderer: React.FC<{
             {slots.map((slot, idx) => (
               <button
                 key={slot.id}
-                onClick={(e) => { stopProp(e); onQrClick(slots, idx); }}
+                onClick={(e) => { stopProp(e); onQrClick?.(slots, idx); }}
                 className="aspect-square flex flex-col items-center justify-center gap-2 border border-gray-200 hover:border-[#FF0000] bg-white transition-all p-4"
               >
                 <ImageIcon size={24} className="text-gray-300" />
