@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { itineraryData } from '../lib/itinerary';
-import { ItineraryCard } from '../components/ItineraryCard';
+import { itineraryData } from '@/lib/itinerary';
+import { ItineraryCard } from '@/components/ItineraryCard';
 
 export default function Home() {
   return (
