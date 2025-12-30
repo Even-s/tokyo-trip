@@ -1,11 +1,11 @@
 import { Trip, Activity, TicketSlot } from './types';
 import { buildActivityId, parseMapTargets, parseTicketInfo, normalizeActivityKey, normalizePlaceLabel, normalizeForDescriptionMatch, buildGmailSearchUrl, extractFlightInfo, syncSlotsWithFiles } from './utils';
-import { attachmentsByFolder, activityKeyToFolderMap, buildActivityKey, attachmentsOverride } from '@/data/itinerary-attachments';
-import { descriptionMap, rawDescriptionList, descriptionOverrideById } from '@/data/itinerary-descriptions';
-import { gmailReservations } from '@/data/gmail-reservations';
-import { rawData } from '@/data/raw-trip-data';
-import { patchRules } from '@/config/trip-patches';
-import { titleAliasMap } from '@/config/trip-aliases';
+import { attachmentsByFolder, activityKeyToFolderMap, buildActivityKey, attachmentsOverride } from '../data/itinerary-attachments';
+import { descriptionMap, rawDescriptionList, descriptionOverrideById } from '../data/itinerary-descriptions';
+import { gmailReservations } from '../data/gmail-reservations';
+import { rawData } from '../data/raw-trip-data';
+import { patchRules } from '../config/trip-patches';
+import { titleAliasMap } from '../config/trip-aliases';
 
 // 1. 建立附件的查找表 (Lookup Map)
 function buildAttachmentMap() {
