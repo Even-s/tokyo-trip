@@ -51,7 +51,7 @@ export function buildActivityId(date: string, title: string): string {
  * 正規化地點顯示名稱
  * 規則：統一將「我家」顯示為「家」
  */
-export function normalizePlaceLabel(label: string): string {
+export function normalizePlaceLabel(label?: string): string {
   if (!label) return '';
   const trimmed = label.trim();
   if (trimmed === '我家') return '家';
@@ -347,7 +347,7 @@ export function buildTripComFlightStatusUrl(flightNo: string): string | null {
  */
 export function extractFlightInfo(mapLink: string | ReadonlyArray<string> | undefined, note: string | undefined): {
   flightInfo?: { airlineCode: string; flightNumber: string; };
-  cleanedMapLink: string | ReadonlyArray<string> | undefined;
+  cleanedMapLink: string | undefined;
   cleanedNote: string | undefined;
 } {
   let cleanedNote = note;
