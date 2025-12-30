@@ -207,17 +207,22 @@ export function parseTicketInfo(
   const slots: TicketSlot[] = [];
 
   rawItems.forEach((item, index) => {
-    const lowerItem = item.toLowerCase();
+    // 支援 "Format|Value" 語法，例如 "QR code(Name)|/path/to/image.png"
+    const parts = item.split('|');
+    const mainPart = parts[0];
+    const valuePart = parts[1]?.trim();
+
+    const lowerItem = mainPart.toLowerCase();
     let count = 1;
     
     // 解析數量 "* N"
-    const countMatch = item.match(/\*\s*(\d+)/);
+    const countMatch = mainPart.match(/\*\s*(\d+)/);
     if (countMatch) {
       count = parseInt(countMatch[1], 10);
     }
 
     // 移除數量標記後的純文字，用於 Label
-    const cleanLabel = item.replace(/\*\s*\d+/, '').trim();
+    const cleanLabel = mainPart.replace(/\*\s*\d+/, '').trim();
 
     // 解析括號中的 meta data
     const metaMatch = cleanLabel.match(/\((.*)\)/);
@@ -225,23 +230,28 @@ export function parseTicketInfo(
     const baseLabel = meta ? cleanLabel.replace(metaMatch[0], '').trim() : cleanLabel;
     const metaLabels = meta ? meta.split('+') : [];
 
+    // 自動偵測：如果 value 是圖片檔，視為 QR Code / 圖片票券
+    const isImageValue = valuePart && /\.(png|jpg|jpeg|gif|webp)$/i.test(valuePart);
+    const isPdfValue = valuePart && /\.pdf$/i.test(valuePart);
 
-    if (lowerItem.includes('qr code') || lowerItem.includes('qr_code')) {
+    if (lowerItem.includes('qr code') || lowerItem.includes('qr_code') || isImageValue) {
       mainType = TicketType.QR_IMAGE;
       for (let i = 0; i < count; i++) {
         slots.push({
           id: `${activityId}:qr:${index}:${i}`,
           type: 'qr_image',
           label: count > 1 ? `${cleanLabel} ${i + 1}` : cleanLabel,
+          value: valuePart, // 填入解析出的 URL
         });
       }
-    } else if (lowerItem.includes('pdf')) {
+    } else if (lowerItem.includes('pdf') || isPdfValue) {
       mainType = TicketType.PDF_FILE;
       for (let i = 0; i < count; i++) {
         slots.push({
           id: `${activityId}:pdf:${index}:${i}`,
           type: 'pdf',
           label: metaLabels[i] || (count > 1 ? `${baseLabel} ${i + 1}` : baseLabel),
+          value: valuePart,
         });
       }
     } else if (lowerItem.includes('link') && lowerItem.includes('驗證碼')) {
@@ -267,7 +277,7 @@ export function parseTicketInfo(
     } else if (lowerItem.includes('跳轉') && lowerItem.includes('app')) {
       mainType = TicketType.APP_JUMP;
       // 特定 App 邏輯：日產租車
-      if (item.includes('日産レンタカーアプリ')) {
+      if (mainPart.includes('日産レンタカーアプリ')) {
         slots.push({
           id: `${activityId}:app:${index}`,
           type: 'app',
@@ -294,7 +304,7 @@ export function parseTicketInfo(
         id: `${activityId}:gmail:${index}`,
         type: 'gmail',
         label: 'Gmail 搜尋',
-        value: { subject: item.replace(/subject:/g, '').replace(/"/g, '') }
+        value: { subject: mainPart.replace(/subject:/g, '').replace(/"/g, '') }
       });
     }
   });

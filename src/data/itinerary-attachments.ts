@@ -167,8 +167,19 @@ const prettify = (name: string) => name
   .replace(/\s+/g, ' ')
   .trim();
 
+const nameMap: Record<string, string> = {
+  "CHAO HSIANG LING": "趙湘鈴",
+  "WANG SHENG CHIEH": "王聖傑",
+  "WANG SHENG CHIH": "王聖智",
+  "WANG HSIN HSIUNG": "王信雄",
+  "HSU HSIU CHUN": "徐秀春",
+};
+
 export const generateLabel = (filename: string): string => {
   const base = stripExt(filename).trim();
+  if (nameMap[base]) {
+    return nameMap[base];
+  }
   if (/^1p$/i.test(base)) return '1P';
   if (/^2p_?1$/i.test(base)) return '2P-1';
   if (/^2p_?2$/i.test(base)) return '2P-2';

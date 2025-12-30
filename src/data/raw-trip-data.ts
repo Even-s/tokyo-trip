@@ -16,6 +16,14 @@ export const rawData = {
         {
           "時間": "10：00",
           "行程": "抵達高雄小港國際機場",
+          "是否預約": "五人機票",
+          "相關格式": [
+            "趙湘鈴|/itinerary-assets/2025-12-31__抵達高雄小港國際機場/CHAO HSIANG LING.pdf",
+            "王聖傑|/itinerary-assets/2025-12-31__抵達高雄小港國際機場/WANG SHENG CHIEH.pdf",
+            "王聖智|/itinerary-assets/2025-12-31__抵達高雄小港國際機場/WANG SHENG CHIH.pdf",
+            "王信雄|/itinerary-assets/2025-12-31__抵達高雄小港國際機場/WANG HSIN HSIUNG.pdf",
+            "徐秀春|/itinerary-assets/2025-12-31__抵達高雄小港國際機場/HSU HSIU CHUN.pdf"
+          ],
           "地點": "高雄國際機場",
           "地圖連結": "https://maps.app.goo.gl/fhQbHGAhxDZtCfhW8"
         },
@@ -28,10 +36,22 @@ export const rawData = {
         {
           "時間": "13：05 - 17：25",
           "行程": "飛往東京成田機場",
-          "是否預約": "五人機票",
-          "相關格式": "PDF * 4",
+          "相關格式": [],
           "地點": "高雄國際機場",
           "地圖連結": "https://maps.app.goo.gl/fhQbHGAhxDZtCfhW8,成田國際機場第二航廈,https://maps.app.goo.gl/esR3RStasZ12h8xQ8,CI126"
+        },
+        {
+          "時間": "18：00",
+          "行程": "入境日本",
+          "地點": "成田國際機場 第二航廈",
+          "地圖連結": "https://maps.app.goo.gl/esR3RStasZ12h8xQ8",
+          "是否預約": "Visit Japan Web",
+          "相關格式": [
+            "王信雄|/itinerary-assets/2025-12-31__VISIT JAPAN/王信雄.png",
+            "王聖傑|/itinerary-assets/2025-12-31__VISIT JAPAN/王聖傑.png",
+            "王聖智|/itinerary-assets/2025-12-31__VISIT JAPAN/王聖智.png",
+            "徐秀春|/itinerary-assets/2025-12-31__VISIT JAPAN/徐秀春.png"
+          ]
         },
         {
           "時間": "19：00 - 20：30",

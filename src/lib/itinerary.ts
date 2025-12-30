@@ -78,17 +78,22 @@ export const tripData: Trip = {
       let { flightInfo, cleanedMapLink, cleanedNote } = extractFlightInfo(mapLink, note);
 
 
-      if (attachmentInfo) {
-        // 如果在 override 列表中找到，則解析附件資訊
-        ({ ticketType, ticketSlots } = parseTicketInfo(attachmentInfo.format, id));
+      // 優先使用 rawData 中的格式 (如果存在)，否則使用 override
+      const rawFormat = ('相關格式' in act) ? act.相關格式 : (attachmentInfo ? attachmentInfo.format : undefined);
 
-        // 策略 B: 以實際檔案為準 (Trust Actual Files)
-        // 如果 attachmentsByFolder 中有更多檔案，則擴充 ticketSlots 以顯示所有檔案
+      if (rawFormat) {
+        ({ ticketType, ticketSlots } = parseTicketInfo(rawFormat, id));
+      }
+
+      // 策略 B: 以實際檔案為準 (Trust Actual Files)
+      // 若明確指定為空陣列 (代表強制無附件)，則不進行檔案同步
+      const isExplicitlyEmpty = Array.isArray(rawFormat) && rawFormat.length === 0;
+      if (fileData && !isExplicitlyEmpty) {
         ticketSlots = syncSlotsWithFiles(id, ticketSlots, fileData);
+      }
 
-        // 從 map 中移除已使用的項目，以便最後檢查是否有未匹配的
+      if (attachmentInfo) {
         attachmentMap.delete(key);
-      } else {
       }
 
       const normalizedPlaceName = normalizePlaceLabel(place);
