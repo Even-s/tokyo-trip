@@ -1,6 +1,6 @@
 import { Trip, Activity, TicketSlot } from './types';
 import { buildActivityId, parseMapTargets, parseTicketInfo, normalizeActivityKey, normalizePlaceLabel, normalizeForDescriptionMatch, buildGmailSearchUrl, extractFlightInfo, syncSlotsWithFiles } from './utils';
-import { attachmentsByFolder, activityKeyToFolderMap, buildActivityKey, attachmentsOverride } from '../data/itinerary-attachments';
+import { attachmentsByFolder, activityKeyToFolderMap, buildActivityKey, attachmentsOverride } from '@/data/itinerary-attachments';
 import { descriptionMap, rawDescriptionList, descriptionOverrideById } from '@/data/itinerary-descriptions';
 import { gmailReservations } from '@/data/gmail-reservations';
 import { rawData } from '@/data/raw-trip-data';

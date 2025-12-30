@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { itineraryData } from '../lib/itinerary';
+import { itineraryData } from '@/lib/itinerary';
 import { ItineraryCard } from '@/components/ItineraryCard';
 import QrModal from '@/components/QrModal';
 import { TicketSlot } from '@/lib/types';
@@ -18,7 +18,7 @@ export default function Home() {
       acc[date].push(item);
       return acc;
     }, {});
-  }, {});
+  }, []);
 
   const days = Object.keys(groupedByDate);
   const [activeDay, setActiveDay] = useState(days[0]);
