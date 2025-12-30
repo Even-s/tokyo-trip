@@ -5,17 +5,6 @@ import { attachmentsByFolder, activityKeyToFolderMap, buildActivityKey } from '.
 import { descriptionMap, rawDescriptionList, descriptionOverrideById } from '@/data/itinerary-descriptions';
 import { gmailReservations } from '@/data/gmail-reservations';
 
-// NOTE: Please add the following property to your Activity type in 'src/lib/types.ts'
-/*
-  export interface Activity {
-    // ... other properties
-    flightInfo?: {
-      airlineCode: string;
-      flightNumber: string;
-    };
-  }
-*/
-
 // 新增：航空公司代碼對照表
 export const AIRLINE_CODES: { [key: string]: string } = {
   UA: '美國聯合航空',
@@ -568,7 +557,12 @@ export const tripData: Trip = {
       }
 
       const normalizedPlaceName = normalizePlaceLabel(act.地點);
-      const { mapTargets, infoLinks } = parseMapTargets(cleanedMapLink, act.地點);
+      const parsed = parseMapTargets(cleanedMapLink, normalizedPlaceName);
+      const mapTargets = parsed.mapTargets.map(t => ({
+        ...t,
+        label: normalizePlaceLabel(t.label || '')
+      }));
+      const infoLinks = parsed.infoLinks;
 
       // Gmail Reservation Mapping
       const gmailMatch = gmailReservations.find(r => {
@@ -643,46 +637,13 @@ export const tripData: Trip = {
         rawRelatedFormat: act.相關格式
       } as Activity;
 
-      // Debug log for "飛往高雄小港機場"
-      if (act.行程.includes('飛往高雄小港機場')) {
-          console.log('[Debug Activity] 飛往高雄小港機場:', {
-              originalNote: act.備註,
-              cleanedNote,
-              flightInfo,
-              mapTargets: activityObj.mapTargets
-          });
-      }
-
-      // Debug/Audit for Vouchers (Dev only)
-      if (process.env.NODE_ENV !== 'production' && specialVoucherData) {
-        console.log(`[Voucher Audit] ${day.日期} ${act.行程}`, { mapTargets: activityObj.mapTargets, voucher: specialVoucherData });
-      }
-
-      // Dev-only audit for '我家' leak
-      if (process.env.NODE_ENV !== 'production') {
-        if (activityObj.placeName === '我家' || activityObj.mapTargets.some(t => t.label === '我家')) {
-          console.warn(`[Place Label Leak] Activity "${activityObj.title}" still contains '我家' label.`);
-        }
-      }
-
-      // Dev-only safeguard
-      if (process.env.NODE_ENV !== 'production') {
-          if (activityObj.flightInfo && activityObj.notes) {
-              const flightNum = activityObj.flightInfo.flightNumber;
-              const airline = activityObj.flightInfo.airlineCode;
-              if (activityObj.notes.includes(flightNum) || activityObj.notes.includes(airline)) {
-                  console.warn(`[Flight token leak detected] Activity: ${activityObj.title}. Flight info extracted but tokens still present in notes: "${activityObj.notes}"`);
-              }
-          }
-      }
-
       return activityObj;
     })
   }))
 };
 
 // Dev-only Audit Tool
-if (process.env.NODE_EXIST !== 'production') {
+if (process.env.NODE_ENV !== 'production') {
     (global as any).auditItineraryAttachments = () => {
         console.table(
             attachmentsOverride.附件下載清單.map(item => {

@@ -40,6 +40,10 @@ export interface Activity {
   infoLinks: InfoLink[];
   ticketType: TicketType;
   ticketSlots: TicketSlot[];
+  flightInfo?: {
+    airlineCode: string;
+    flightNumber: string;
+  };
 }
 
 export interface Day {
