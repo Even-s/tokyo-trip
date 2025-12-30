@@ -355,7 +355,7 @@ export function extractFlightInfo(mapLink: string | ReadonlyArray<string> | unde
     return { cleanedMapLink: mapLink, cleanedNote };
   }
 
-  const linkString = Array.isArray(mapLink) ? mapLink.join(',') : mapLink;
+  const linkString = typeof mapLink === 'string' ? mapLink : mapLink.join(',');
   const parts = linkString.split(',');
   const flightCodeRegex = /^([A-Z]{2})(\d{2,4})$/; // e.g., CI126
   const airlineCodeOnlyRegex = /^[A-Z]{2}$/; // e.g., UA
