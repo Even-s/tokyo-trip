@@ -1,4 +1,4 @@
-import { Trip, Activity } from './types';
+import { Trip, Activity, TicketType } from './types';
 import { buildActivityId, parseMapTargets, parseTicketInfo, normalizeActivityKey, normalizePlaceLabel, normalizeForDescriptionMatch, buildGmailSearchUrl, extractFlightInfo, syncSlotsWithFiles } from './utils';
 import { attachmentsByFolder, activityKeyToFolderMap, buildActivityKey, attachmentsOverride } from '../data/itinerary-attachments';
 import { descriptionMap, rawDescriptionList, descriptionOverrideById } from '../data/itinerary-descriptions';
@@ -70,7 +70,7 @@ export const tripData: Trip = {
       activityIdRegistry.set(baseId, count + 1);
       const id = baseId;
 
-      let ticketType: Activity['ticketType'] | undefined;
+      let ticketType: Activity['ticketType'] = TicketType.NONE;
       let ticketSlots: Activity['ticketSlots'] = [];
 
       // ** FIX: Extract flight info and clean map links before parsing **
