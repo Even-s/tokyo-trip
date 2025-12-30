@@ -1,4 +1,4 @@
-import { Trip, Activity, TicketSlot } from './types';
+import { Trip, Activity } from './types';
 import { buildActivityId, parseMapTargets, parseTicketInfo, normalizeActivityKey, normalizePlaceLabel, normalizeForDescriptionMatch, buildGmailSearchUrl, extractFlightInfo, syncSlotsWithFiles } from './utils';
 import { attachmentsByFolder, activityKeyToFolderMap, buildActivityKey, attachmentsOverride } from '../data/itinerary-attachments';
 import { descriptionMap, rawDescriptionList, descriptionOverrideById } from '../data/itinerary-descriptions';
@@ -43,12 +43,12 @@ export const tripData: Trip = {
   days: rawData.行程詳情.map(day => ({
     date: day.日期,
     activities: day.活動.map(act => {
-      // Lazy init map inside the loop? No, better outside. 
-      // But since we are inside the map function, we need to access the map.
-      // Let's initialize it once outside.
-      // Actually, `tripData` is exported as a const, so we can init map once.
-      // See below for the implementation.
-      
+      const mapLink = '地圖連結' in act ? act.地圖連結 : undefined;
+      const note = '備註' in act ? act.備註 : undefined;
+      const place = '地點' in act ? act.地點 : undefined;
+      const reserved = '是否預約' in act ? act.是否預約 : undefined;
+      const reservationTime = '預約時間' in act ? act.預約時間 : undefined;
+
       // 使用 alias map 來匹配
       const overrideTitle = titleAliasMap[act.行程.trim()] || act.行程;
       const key = normalizeActivityKey(day.日期, overrideTitle.split(' (')[0]);
@@ -74,7 +74,8 @@ export const tripData: Trip = {
       let ticketSlots: Activity['ticketSlots'] = [];
 
       // ** FIX: Extract flight info and clean map links before parsing **
-      let { flightInfo, cleanedMapLink, cleanedNote } = extractFlightInfo(act.地圖連結, act.備註);
+      let { flightInfo, cleanedMapLink, cleanedNote } = extractFlightInfo(mapLink, note);
+
 
       if (attachmentInfo) {
         // 如果在 override 列表中找到，則解析附件資訊
@@ -89,8 +90,8 @@ export const tripData: Trip = {
       } else {
       }
 
-      const normalizedPlaceName = normalizePlaceLabel(act.地點);
-      const parsed = parseMapTargets(cleanedMapLink, normalizedPlaceName);
+      const normalizedPlaceName = normalizePlaceLabel(place);
+      const parsed = parseMapTargets(cleanedMapLink, normalizedPlaceName || '');
       const mapTargets = parsed.mapTargets.map(t => ({
         ...t,
         label: normalizePlaceLabel(t.label || '')
@@ -109,32 +110,24 @@ export const tripData: Trip = {
       }
 
       // --- Description Mapping Logic ---
-      const description = resolveDescription(id, act.行程, act.地點 || '');
+      const description = resolveDescription(id, act.行程, place || '');
 
-      const activityObj = {
+      const activityObj: Activity = {
         id,
         date: day.日期,
         time: act.時間,
         title: act.行程,
         placeName: normalizedPlaceName, // 附件名稱現在來自 override list
-        reservedLabel: attachmentInfo ? attachmentInfo.name : act.是否預約,
+        reservedLabel: attachmentInfo ? attachmentInfo.name : reserved,
         flightInfo, // ** ADDED: Pass flight info to the final object **
-        reservationTime: act.預約時間,
+        reservationTime,
         description, // ** ADDED: Description **
         notes: cleanedNote, // ** FIX: Use cleaned note **
         mapTargets, // ** FIX: Use cleaned map link **
         infoLinks, // ** ADDED: Info links **
         ticketType,
-        ticketSlots,
-        // Compatibility properties for UI
-        activity: act.行程,
-        location: normalizedPlaceName,
-        note: cleanedNote, // ** FIX: Use cleaned note **
-        isReserved: !!(attachmentInfo ? attachmentInfo.name : act.是否預約),
-        attachments: fileData,
-        // @ts-ignore: rawRelatedFormat is not in Activity interface but useful for debugging
-        rawRelatedFormat: act.相關格式
-      } as Activity;
+        ticketSlots
+      };
 
       // Apply Patches (Rules-based modifications)
       let finalActivity = activityObj;
