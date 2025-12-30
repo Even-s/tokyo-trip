@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { MapTarget, TicketSlot, TicketType, Activity, InfoLink } from "./types";
+import { AIRLINE_CODES } from '@/config/airline-codes';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -338,4 +339,146 @@ export function buildTripComFlightStatusUrl(flightNo: string): string | null {
   }
 
   return `https://tw.trip.com/flights/status-${cleanFlightNo}/`;
+}
+
+/**
+ * Extracts flight information from map link strings and notes,
+ * returning the flight data and a cleaned map link string.
+ */
+export function extractFlightInfo(mapLink: string | string[] | undefined, note: string | undefined): {
+  flightInfo?: { airlineCode: string; flightNumber: string; };
+  cleanedMapLink: string | string[] | undefined;
+  cleanedNote: string | undefined;
+} {
+  let cleanedNote = note;
+  if (!mapLink) {
+    return { cleanedMapLink: mapLink, cleanedNote };
+  }
+
+  const linkString = Array.isArray(mapLink) ? mapLink.join(',') : mapLink;
+  const parts = linkString.split(',');
+  const flightCodeRegex = /^([A-Z]{2})(\d{2,4})$/; // e.g., CI126
+  const airlineCodeOnlyRegex = /^[A-Z]{2}$/; // e.g., UA
+  const flightNumberRegex = /^\d{2,4}$/; // e.g., 837
+
+  let flightInfo: { airlineCode: string; flightNumber: string; } | undefined;
+  const cleanedParts: string[] = [];
+  let airlineCodePart: string | null = null;
+
+  for (const part of parts) {
+    const trimmedPart = part.trim();
+    const flightMatch = trimmedPart.match(flightCodeRegex);
+
+    if (flightMatch) {
+      flightInfo = { airlineCode: flightMatch[1], flightNumber: flightMatch[2] };
+    } else if (airlineCodeOnlyRegex.test(trimmedPart) && AIRLINE_CODES[trimmedPart]) {
+      airlineCodePart = trimmedPart;
+    } else {
+      cleanedParts.push(trimmedPart);
+    }
+  }
+
+  if (airlineCodePart) {
+      if (note && flightNumberRegex.test(note.trim())) {
+          flightInfo = { airlineCode: airlineCodePart, flightNumber: note.trim() };
+          cleanedNote = undefined; // Consumed note
+      } else {
+          cleanedParts.push(airlineCodePart);
+      }
+  }
+
+  return { flightInfo, cleanedMapLink: cleanedParts.join(','), cleanedNote };
+}
+
+/**
+ * 開啟日產租車 App (Android Intent) 或 Fallback
+ */
+export function openNissanRentacarApp(): void {
+  const isAndroid = typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent);
+  const isIOS = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  const intentUrl = "intent://#Intent;package=com.nissan.rentacar.aprs;end";
+  const playStoreUrl = "https://play.google.com/store/apps/details?id=com.nissan.rentacar.aprs&hl=zh_TW";
+  const webUrl = "https://www.nissan-rentacar.com/";
+
+  if (isAndroid) {
+    window.location.href = intentUrl;
+    const start = Date.now();
+    setTimeout(() => {
+      // 如果 1.5 秒後頁面仍然可見，代表 App 未成功開啟
+      if (document.visibilityState === 'visible' && Date.now() - start < 1500) {
+        window.location.href = playStoreUrl;
+      }
+    }, 1000);
+  } else {
+    window.open(isIOS ? webUrl : playStoreUrl, '_blank', 'noopener,noreferrer');
+  }
+}
+
+/**
+ * 同步附件檔案與票券插槽
+ * 如果實際檔案 (fileData) 比預定義的插槽多，會自動補上插槽。
+ * 並將檔案的 URL 與 Label 填入插槽中。
+ */
+export function syncSlotsWithFiles(
+  activityId: string,
+  currentSlots: TicketSlot[],
+  fileData: { pdf?: { label: string; url: string }[]; qr?: { label: string; url: string }[] } | undefined
+): TicketSlot[] {
+  if (!fileData) return currentSlots;
+
+  const out = [...currentSlots];
+
+  // 1. Sync PDF
+  if (fileData.pdf) {
+    const currentPdfSlots = out.filter(s => s.type === 'pdf');
+    const needed = fileData.pdf.length - currentPdfSlots.length;
+
+    if (needed > 0) {
+      for (let i = 0; i < needed; i++) {
+        out.push({
+          id: `${activityId}:pdf:extra:${i}`,
+          type: 'pdf',
+          label: `PDF ${currentPdfSlots.length + i + 1}`,
+        });
+      }
+    }
+
+    // 重新 filter 一次以確保順序正確，並填入資料
+    let pdfIndex = 0;
+    out.forEach(slot => {
+      if (slot.type === 'pdf' && fileData.pdf && pdfIndex < fileData.pdf.length) {
+        slot.label = fileData.pdf[pdfIndex].label;
+        slot.value = fileData.pdf[pdfIndex].url;
+        pdfIndex++;
+      }
+    });
+  }
+
+  // 2. Sync QR
+  if (fileData.qr) {
+    const currentQrSlots = out.filter(s => s.type === 'qr_image');
+    const needed = fileData.qr.length - currentQrSlots.length;
+
+    if (needed > 0) {
+      for (let i = 0; i < needed; i++) {
+        out.push({
+          id: `${activityId}:qr:extra:${i}`,
+          type: 'qr_image',
+          label: `QR ${currentQrSlots.length + i + 1}`,
+        });
+      }
+    }
+
+    let qrIndex = 0;
+    out.forEach(slot => {
+      if (slot.type === 'qr_image' && fileData.qr && qrIndex < fileData.qr.length) {
+        slot.label = fileData.qr[qrIndex].label;
+        slot.value = fileData.qr[qrIndex].url;
+        qrIndex++;
+      }
+    });
+  }
+
+  return out;
 }

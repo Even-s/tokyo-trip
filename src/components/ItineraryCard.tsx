@@ -1,10 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { Activity, TicketSlot } from '@/lib/types';
 import { MapPin, ChevronDown, ChevronUp, ExternalLink, Image as ImageIcon, FileText, Smartphone, Mail, Plane, Info, Navigation } from 'lucide-react';
-import { cn, buildGoogleMapsUrl, buildTripComFlightStatusUrl } from '@/lib/utils';
+import { cn, buildGoogleMapsUrl, buildTripComFlightStatusUrl, openNissanRentacarApp } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { openNissanRentacarApp } from '@/lib/openNissanRentacarApp';
-import { AIRLINE_CODES } from '@/lib/itinerary'; // 引入航空公司代碼
+import { AIRLINE_CODES } from '@/config/airline-codes';
 
 interface ItineraryCardProps {
   item: Activity;
