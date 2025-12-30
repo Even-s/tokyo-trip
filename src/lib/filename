@@ -1,0 +1,36 @@
+/**
+ * 行程附件對照表
+ * 
+ * 使用方式：
+ * 1. 將檔案放入 public/itinerary-assets/ 資料夾
+ * 2. 在此處新增對應的 Activity ID 與檔案路徑
+ * 3. Activity ID 可在網頁上透過檢查元素或查看 console 取得 (格式為：日期-時間-標題)
+ */
+
+export interface AttachmentMap {
+  [activityId: string]: {
+    pdf?: string[]; // 對應 PDF slot 順序 (PDF 1, PDF 2...)
+    qr?: string[];  // 對應 QR slot 順序 (QR 1, QR 2...)
+  };
+}
+
+export const attachments: AttachmentMap = {
+  // === 範例資料 (請依實際檔案路徑修改) ===
+  
+  // 2026/1/1 晴空塔 (QR code * 1)
+  "2026-1-1-5-30-7-30-元旦日出特別營業": {
+    qr: ["/itinerary-assets/2026-01-01-05-30-skytree/qr-1.png"] 
+  },
+
+  // 2025/12/31 飛往東京 (PDF * 4)
+  "2025-12-31-13-05-17-25-飛往東京成田機場": {
+    pdf: [
+      "/itinerary-assets/2025-12-31-13-05-flight/ticket-1.pdf",
+      "/itinerary-assets/2025-12-31-13-05-flight/ticket-2.pdf",
+      "/itinerary-assets/2025-12-31-13-05-flight/ticket-3.pdf",
+      "/itinerary-assets/2025-12-31-13-05-flight/ticket-4.pdf"
+    ]
+  },
+  
+  // 2026/1/2 租車 (App 跳轉，不需在此設定檔案)
+};
