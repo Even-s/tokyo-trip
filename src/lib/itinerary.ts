@@ -6,6 +6,7 @@ import { gmailReservations } from '../data/gmail-reservations';
 import { rawData } from '../data/raw-trip-data';
 import { patchRules } from '../config/trip-patches';
 import { titleAliasMap } from '../config/trip-aliases';
+import { APP_TITLE } from '../config/constants';
 
 // 1. 建立附件的查找表 (Lookup Map)
 function buildAttachmentMap() {
@@ -39,7 +40,7 @@ const gmailMap = buildGmailMap();
 
 // 轉換為應用程式使用的 Trip 結構
 export const tripData: Trip = {
-  name: rawData.行程名稱,
+  name: APP_TITLE,
   days: rawData.行程詳情.map(day => ({
     date: day.日期,
     activities: day.活動.map(act => {

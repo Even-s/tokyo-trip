@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { APP_TITLE } from "@/config/constants";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -9,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Tokyo Typography Trip",
+  title: APP_TITLE,
   description: "A Swiss Style Itinerary",
 };
 

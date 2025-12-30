@@ -52,7 +52,6 @@ export default function Home() {
               className="text-6xl md:text-9xl font-bold tracking-tighter leading-[0.85]"
             >
               TOKYO<br />
-              TYPO<br />
               <span className="text-[#FF0000]">TRIP</span>
             </motion.h1>
           </div>
