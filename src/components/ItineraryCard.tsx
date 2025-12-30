@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Activity, TicketSlot } from '@/lib/types';
 import { MapPin, ChevronDown, ChevronUp, ExternalLink, Image as ImageIcon, FileText, Smartphone, Mail, Plane, Info, Navigation } from 'lucide-react';
-import { cn, buildGoogleMapsUrl, buildTripComFlightStatusUrl, openNissanRentacarApp } from '@/lib/utils';
+import { buildGoogleMapsUrl, buildTripComFlightStatusUrl, openNissanRentacarApp } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AIRLINE_CODES } from '@/config/airline-codes';
 
@@ -18,7 +18,7 @@ const ACTION_BUTTON_CLASS = "flex items-center gap-2 px-4 py-3 border border-gra
 // App Jump button style: Same dimensions as ACTION_BUTTON_CLASS but with black background
 const APP_BUTTON_CLASS = "w-fit flex items-center gap-2 px-4 py-3 border border-black bg-black text-white hover:bg-[#FF0000] hover:border-[#FF0000] transition-colors min-h-[48px]";
 
-export const ItineraryCard: React.FC<ItineraryCardProps> = ({ item, index, onQrClick }) => {
+export const ItineraryCard: React.FC<ItineraryCardProps> = ({ item, onQrClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleOpen = () => setIsOpen(!isOpen);
 
@@ -79,7 +79,7 @@ export const ItineraryCard: React.FC<ItineraryCardProps> = ({ item, index, onQrC
               {item.placeName && (
                 <div className="flex items-center gap-1 text-[10px] md:text-xs font-bold uppercase tracking-[0.15em] text-[#FF0000]">
                   <MapPin size={12} strokeWidth={3} />
-                  <span className="truncate max-w-[200px]">{item.location || item.placeName}</span>
+                  <span className="truncate max-w-[200px]">{item.placeName}</span>
                 </div>
               )}
               {/* Status Chips */}
