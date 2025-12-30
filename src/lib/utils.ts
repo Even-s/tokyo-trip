@@ -77,7 +77,7 @@ export function normalizeForDescriptionMatch(s: string): string {
  * 2. 逗號分隔字串: "URL, Label, URL2, Label2, Note"
  * 3. 陣列: ["URL, Label", "URL2"]
  */
-export function parseMapTargets(rawMapLink: string | string[] | undefined, fallbackPlaceName?: string): { mapTargets: MapTarget[], infoLinks: InfoLink[] } {
+export function parseMapTargets(rawMapLink: string | ReadonlyArray<string> | undefined, fallbackPlaceName?: string): { mapTargets: MapTarget[], infoLinks: InfoLink[] } {
   if (!rawMapLink) {
     return {
       mapTargets: fallbackPlaceName ? [{ query: fallbackPlaceName, label: fallbackPlaceName }] : [],
@@ -195,7 +195,7 @@ export function parseLinkWithCode(text: string): { serviceName?: string; reserva
  * 解析相關格式 (Ticket Info)
  */
 export function parseTicketInfo(
-  rawRelatedFormat: string | string[] | undefined, 
+  rawRelatedFormat: string | ReadonlyArray<string> | undefined, 
   activityId: string
 ): { ticketType: TicketType; ticketSlots: TicketSlot[] } {
   if (!rawRelatedFormat) {
@@ -345,9 +345,9 @@ export function buildTripComFlightStatusUrl(flightNo: string): string | null {
  * Extracts flight information from map link strings and notes,
  * returning the flight data and a cleaned map link string.
  */
-export function extractFlightInfo(mapLink: string | string[] | undefined, note: string | undefined): {
+export function extractFlightInfo(mapLink: string | ReadonlyArray<string> | undefined, note: string | undefined): {
   flightInfo?: { airlineCode: string; flightNumber: string; };
-  cleanedMapLink: string | string[] | undefined;
+  cleanedMapLink: string | ReadonlyArray<string> | undefined;
   cleanedNote: string | undefined;
 } {
   let cleanedNote = note;
