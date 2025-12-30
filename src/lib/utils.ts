@@ -98,7 +98,7 @@ export function parseMapTargets(rawMapLink: string | ReadonlyArray<string> | und
 
   rawItems.forEach(item => {
     // 先用逗號切分，並過濾空字串
-    const tokens = item.split(',').map(t => t.trim()).filter(Boolean);
+    const tokens = item.split(',').map((t: string) => t.trim()).filter((t: string) => t.length > 0);
     
     for (let i = 0; i < tokens.length; i++) {
       const token = tokens[i];
